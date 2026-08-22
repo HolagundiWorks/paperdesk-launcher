@@ -9,6 +9,7 @@
         <package android:name="org.tasks" />
         <package android:name="org.fossify.math" />
         <package android:name="org.fossify.filemanager" />
+        <package android:name="ua.acclorite.book_story" />
     </queries>
     <application
         android:allowBackup="false"

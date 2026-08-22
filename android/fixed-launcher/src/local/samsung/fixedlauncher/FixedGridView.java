@@ -20,8 +20,8 @@ final class FixedGridView extends View {
     private static final int CARBON_SUCCESS=Color.rgb(66,190,101);
     private static final int CARBON_INFO=Color.rgb(69,137,255);
     private static final int CARBON_NEUTRAL=Color.rgb(57,57,57);
-    private static final String[] APPS={"org.fossify.gallery","org.fossify.calendar","org.fossify.clock","org.fossify.notes","org.tasks","org.fossify.math","org.fossify.filemanager"};
-    private static final String[] ICONS={"fossify_gallery","fossify_calendar","fossify_clock","fossify_notes","tasks","fossify_calculator","fossify_filemanager"};
+    private static final String[] APPS={"org.fossify.gallery","org.fossify.calendar","org.fossify.clock","org.fossify.notes","org.tasks","org.fossify.math","org.fossify.filemanager","ua.acclorite.book_story"};
+    private static final String[] ICONS={"fossify_gallery","fossify_calendar","fossify_clock","fossify_notes","tasks","fossify_calculator","fossify_filemanager","book_story"};
     private static final String ICON_PACK="com.donnnno.arcticons";
     private final PackageManager pm;
     private final BatteryManager battery;

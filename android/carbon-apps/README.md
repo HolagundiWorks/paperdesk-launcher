@@ -8,6 +8,7 @@ The large upstream repositories are kept outside the OneDrive workspace:
 
 - `D:\Samsung-A10s-Recovery\source\FossifyCommons`
 - `D:\Samsung-A10s-Recovery\source\Gallery`
+- `D:\Samsung-A10s-Recovery\source\BookStory`
 
 Both forks use the `codex/carbon-ui` branch. Commons is published locally at the upstream-compatible `org.fossify:commons:6.1.6` coordinate, and app repositories resolve `mavenLocal()` first.
 
@@ -29,3 +30,7 @@ Keeping `GRADLE_USER_HOME` on `D:` avoids a Windows KSP cross-volume path defect
 Gallery is the validation app. Its custom release retains `org.fossify.gallery`, is signed with the project development key, installed on the test A10s, and verified to launch. Replacing an upstream-signed installation clears that app's private data; shared media is unaffected.
 
 The remaining Fossify apps follow the same shared-library workflow. Their app-specific icon replacement is tracked separately from the shared Carbon color/shape layer.
+
+## Carbon Reader
+
+Carbon Reader is the `codex/carbon-reader` fork of GPL-3.0 Book's Story. It supports PDF and EPUB on Android 8+, uses the fixed Carbon Gray 100 palette and zero-radius app/library controls, and is installed with its production package ID `ua.acclorite.book_story`. Rebuild and reinstall it with `tools/install-carbon-reader.ps1`.
