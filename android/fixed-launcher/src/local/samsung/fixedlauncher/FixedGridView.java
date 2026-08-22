@@ -1,186 +1,58 @@
 package local.samsung.fixedlauncher;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
-import android.view.HapticFeedbackConstants;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 final class FixedGridView extends View {
-    private static final int COLUMNS = 5;
-    private static final int ROWS = 3;
-    private static final int SLOT_COUNT = COLUMNS * ROWS;
-    private static final long DRAG_DELAY_MS = 260;
-    private static final String EMPTY = "-";
-    private static final String[] DEFAULT_ORDER = {
-        "org.fossify.gallery", "org.fossify.calendar", "org.fossify.clock",
-        "org.fossify.notes", "org.tasks", "org.fossify.math",
-        "org.fossify.filemanager", EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY
-    };
+    private static final long TOTAL=1500000L;
+    private static final String[] APPS={"org.fossify.gallery","org.fossify.calendar","org.fossify.clock","org.fossify.notes","org.tasks","org.fossify.math","org.fossify.filemanager"};
+    private final PackageManager pm;
+    private final Paint fill=new Paint(1), line=new Paint(1);
+    private float scroll,downX,downY,startScroll; private long downAt,endAt;
+    private boolean dockTouch,clockTouch,running; private long remaining=TOTAL;
 
-    private final PackageManager packages;
-    private final SharedPreferences preferences;
-    private final Paint tilePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final String[] slots = new String[SLOT_COUNT];
-    private int pressedSlot = -1;
-    private int draggedSlot = -1;
-    private float downX;
-    private float downY;
-    private long downAt;
+    FixedGridView(Context c){super(c);pm=c.getPackageManager();setBackgroundColor(Color.BLACK);setWillNotDraw(false);line.setStyle(Paint.Style.STROKE);line.setStrokeCap(Paint.Cap.ROUND);}
 
-    FixedGridView(Context context) {
-        super(context);
-        setWillNotDraw(false);
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        setBackgroundColor(Color.BLACK);
-        packages = context.getPackageManager();
-        preferences = context.getSharedPreferences("grid", Context.MODE_PRIVATE);
-        tilePaint.setColor(Color.rgb(22, 22, 22));
-        borderPaint.setColor(Color.rgb(57, 57, 57));
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(dp(1));
-        loadOrder();
+    protected void onDraw(Canvas c){super.onDraw(c);tick();clock(c);date(c);dock(c);postInvalidateDelayed(1000);}
+
+    private void clock(Canvas c){
+        float x=getWidth()*.29f,y=getHeight()*.29f,r=Math.min(dp(76),getWidth()*.19f);
+        line.setStrokeWidth(dp(2));line.setColor(Color.rgb(57,57,57));c.drawCircle(x,y,r,line);
+        float f=Math.max(0,Math.min(1,remaining/(float)TOTAL)),sweep=360*f;
+        line.setStrokeWidth(dp(3));line.setColor(Color.rgb(255,92,53));
+        RectF ring=new RectF(x-r-dp(7),y-r-dp(7),x+r+dp(7),y+r+dp(7));c.drawArc(ring,-90,sweep,false,line);
+        double e=Math.toRadians(-90+sweep);fill.setColor(Color.rgb(255,92,53));c.drawCircle(x+(r+dp(7))*(float)Math.cos(e),y+(r+dp(7))*(float)Math.sin(e),dp(4),fill);
+        Calendar now=Calendar.getInstance();float sec=now.get(Calendar.SECOND),min=now.get(Calendar.MINUTE)+sec/60,hour=now.get(Calendar.HOUR)+min/60;
+        hand(c,x,y,r*.5f,hour*30-90,dp(4),Color.WHITE);hand(c,x,y,r*.72f,min*6-90,dp(3),Color.WHITE);hand(c,x,y,r*.78f,sec*6-90,dp(1),Color.rgb(255,92,53));
+        fill.setColor(Color.rgb(255,92,53));c.drawCircle(x,y,dp(4),fill);
+        fill.setTypeface(Typeface.create("sans",0));fill.setTextAlign(Paint.Align.CENTER);fill.setTextSize(dp(13));fill.setColor(Color.rgb(198,198,198));long t=Math.max(0,remaining/1000);
+        c.drawText(String.format(Locale.US,"%02d:%02d · Pomodoro",t/60,t%60),x,y+r+dp(35),fill);
     }
 
-    private void loadOrder() {
-        String saved = preferences.getString("order", null);
-        String[] parsed = saved == null ? DEFAULT_ORDER : saved.split(",", -1);
-        for (int index = 0; index < SLOT_COUNT; index++) {
-            slots[index] = index < parsed.length && !parsed[index].isEmpty() ? parsed[index] : EMPTY;
-        }
-    }
+    private void date(Canvas c){float x=getWidth()*.29f,y=getHeight()*.29f,r=Math.min(dp(76),getWidth()*.19f);fill.setTypeface(Typeface.create("sans",0));fill.setTextAlign(Paint.Align.LEFT);fill.setTextSize(dp(20));fill.setColor(Color.WHITE);c.drawText(new SimpleDateFormat("dd MMMM yyyy",Locale.getDefault()).format(new Date()),x+r+dp(24),y+dp(7),fill);}
 
-    private void saveOrder() {
-        preferences.edit().putString("order", String.join(",", slots)).apply();
-    }
+    private void dock(Canvas c){RectF d=dockRect();float cell=d.width()/5;c.save();c.clipRect(d);c.translate(-scroll,0);for(int i=0;i<APPS.length;i++){float l=d.left+i*cell;RectF tile=new RectF(l+dp(4),d.top+dp(4),l+cell-dp(4),d.bottom-dp(4));fill.setColor(Color.rgb(22,22,22));c.drawRoundRect(tile,dp(4),dp(4),fill);line.setStrokeWidth(dp(1));line.setColor(Color.rgb(57,57,57));c.drawRoundRect(tile,dp(4),dp(4),line);icon(c,APPS[i],tile);}c.restore();}
+    private void icon(Canvas c,String p,RectF t){try{Drawable d=pm.getApplicationIcon(p);int z=Math.round(Math.min(t.width(),t.height())*.56f),l=Math.round(t.centerX()-z/2f),top=Math.round(t.centerY()-z/2f);d.setBounds(l,top,l+z,top+z);d.draw(c);}catch(PackageManager.NameNotFoundException ignored){}}
+    private RectF dockRect(){float b=getHeight()-dp(28);return new RectF(dp(8),b-dp(86),getWidth()-dp(8),b);}
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        float gridTop = getHeight() * 0.5f;
-        float horizontalPadding = dp(10);
-        float gap = dp(6);
-        float cell = (getWidth() - horizontalPadding * 2 - gap * (COLUMNS - 1)) / COLUMNS;
-        float availableHeight = getHeight() - gridTop - dp(20);
-        float verticalGap = Math.max(dp(6), (availableHeight - cell * ROWS) / Math.max(1, ROWS - 1));
+    public boolean onTouchEvent(MotionEvent e){float cx=getWidth()*.29f,cy=getHeight()*.29f,cr=Math.min(dp(95),getWidth()*.24f);switch(e.getActionMasked()){
+        case MotionEvent.ACTION_DOWN:downX=e.getX();downY=e.getY();downAt=SystemClock.uptimeMillis();startScroll=scroll;dockTouch=dockRect().contains(downX,downY);clockTouch=dist(downX,downY,cx,cy)<=cr;return true;
+        case MotionEvent.ACTION_MOVE:if(dockTouch){scroll=clamp(startScroll+downX-e.getX());invalidate();}return true;
+        case MotionEvent.ACTION_UP:float travel=dist(downX,downY,e.getX(),e.getY());if(clockTouch&&travel<dp(12)){if(SystemClock.uptimeMillis()-downAt>=650)reset();else toggle();}else if(dockTouch&&travel<dp(10)){int i=(int)((e.getX()-dockRect().left+scroll)/(dockRect().width()/5));if(i>=0&&i<APPS.length)launch(APPS[i]);}dockTouch=clockTouch=false;return true;
+        case MotionEvent.ACTION_CANCEL:dockTouch=clockTouch=false;return true;default:return false;}}
 
-        for (int slot = 0; slot < SLOT_COUNT; slot++) {
-            int column = slot % COLUMNS;
-            int row = slot / COLUMNS;
-            float left = horizontalPadding + column * (cell + gap);
-            float top = gridTop + row * (cell + verticalGap);
-            RectF tile = new RectF(left, top, left + cell, top + cell);
-            tilePaint.setColor(slot == draggedSlot ? Color.rgb(38, 38, 38) : Color.rgb(22, 22, 22));
-            canvas.drawRoundRect(tile, dp(3), dp(3), tilePaint);
-            canvas.drawRoundRect(tile, dp(3), dp(3), borderPaint);
-            drawIcon(canvas, slots[slot], tile);
-        }
-    }
-
-    private void drawIcon(Canvas canvas, String packageName, RectF tile) {
-        if (EMPTY.equals(packageName)) return;
-        try {
-            Drawable icon = packages.getApplicationIcon(packageName);
-            int iconSize = Math.round(tile.width() * 0.56f);
-            int left = Math.round(tile.centerX() - iconSize / 2f);
-            int top = Math.round(tile.centerY() - iconSize / 2f);
-            icon.setBounds(left, top, left + iconSize, top + iconSize);
-            icon.draw(canvas);
-        } catch (PackageManager.NameNotFoundException ignored) {
-            // Missing fixed apps intentionally leave an empty-looking tile.
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int slot = slotAt(event.getX(), event.getY());
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                pressedSlot = slot;
-                draggedSlot = -1;
-                downX = event.getX();
-                downY = event.getY();
-                downAt = SystemClock.uptimeMillis();
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                if (pressedSlot >= 0 && draggedSlot < 0 &&
-                        (SystemClock.uptimeMillis() - downAt >= DRAG_DELAY_MS ||
-                         distance(event.getX(), event.getY(), downX, downY) > dp(12))) {
-                    draggedSlot = pressedSlot;
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                    invalidate();
-                }
-                if (draggedSlot >= 0 && slot >= 0 && slot != draggedSlot) {
-                    String moving = slots[draggedSlot];
-                    slots[draggedSlot] = slots[slot];
-                    slots[slot] = moving;
-                    draggedSlot = slot;
-                    saveOrder();
-                    invalidate();
-                }
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (draggedSlot < 0 && pressedSlot >= 0 && pressedSlot == slot &&
-                        SystemClock.uptimeMillis() - downAt < DRAG_DELAY_MS) {
-                    launch(slots[pressedSlot]);
-                }
-                pressedSlot = -1;
-                draggedSlot = -1;
-                invalidate();
-                return true;
-            case MotionEvent.ACTION_CANCEL:
-                pressedSlot = -1;
-                draggedSlot = -1;
-                invalidate();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private int slotAt(float x, float y) {
-        float gridTop = getHeight() * 0.5f;
-        float horizontalPadding = dp(10);
-        float gap = dp(6);
-        float cell = (getWidth() - horizontalPadding * 2 - gap * (COLUMNS - 1)) / COLUMNS;
-        float availableHeight = getHeight() - gridTop - dp(20);
-        float verticalGap = Math.max(dp(6), (availableHeight - cell * ROWS) / Math.max(1, ROWS - 1));
-        for (int slot = 0; slot < SLOT_COUNT; slot++) {
-            int column = slot % COLUMNS;
-            int row = slot / COLUMNS;
-            float left = horizontalPadding + column * (cell + gap);
-            float top = gridTop + row * (cell + verticalGap);
-            if (x >= left && x <= left + cell && y >= top && y <= top + cell) return slot;
-        }
-        return -1;
-    }
-
-    private void launch(String packageName) {
-        if (EMPTY.equals(packageName)) return;
-        Intent intent = packages.getLaunchIntentForPackage(packageName);
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            getContext().startActivity(intent);
-        }
-    }
-
-    private float dp(float value) {
-        return value * getResources().getDisplayMetrics().density;
-    }
-
-    private static float distance(float x1, float y1, float x2, float y2) {
-        float dx = x1 - x2;
-        float dy = y1 - y2;
-        return (float) Math.sqrt(dx * dx + dy * dy);
-    }
+    private float clamp(float v){return Math.max(0,Math.min((APPS.length-5)*dockRect().width()/5,v));}
+    private void toggle(){tick();if(remaining<=0)remaining=TOTAL;running=!running;if(running)endAt=SystemClock.elapsedRealtime()+remaining;invalidate();}
+    private void reset(){running=false;remaining=TOTAL;invalidate();}
+    private void tick(){if(running){remaining=Math.max(0,endAt-SystemClock.elapsedRealtime());if(remaining==0)running=false;}}
+    private void hand(Canvas c,float x,float y,float len,float deg,float w,int color){double a=Math.toRadians(deg);line.setStrokeWidth(w);line.setColor(color);c.drawLine(x,y,x+len*(float)Math.cos(a),y+len*(float)Math.sin(a),line);}
+    private void launch(String p){Intent i=pm.getLaunchIntentForPackage(p);if(i!=null){i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);getContext().startActivity(i);}}
+    private float dp(float v){return v*getResources().getDisplayMetrics().density;}
+    private static float dist(float a,float b,float c,float d){float x=a-c,y=b-d;return(float)Math.sqrt(x*x+y*y);}
 }
