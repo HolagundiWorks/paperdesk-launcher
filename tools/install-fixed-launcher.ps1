@@ -15,6 +15,9 @@ if ((& $AdbPath shell pm list packages com.donnnno.arcticons) -notmatch 'com\.do
 & (Join-Path $project 'build.ps1')
 & $AdbPath install -r (Join-Path $project 'out\fixed-launcher.apk')
 & $AdbPath shell settings put system double_tap_to_sleep 0
+# One UI hosts its privileged gesture-recents/Quickstep service in Samsung
+# Launcher. Keep that package installed but leave our fixed launcher as HOME.
+& $AdbPath shell cmd package install-existing --user 0 com.sec.android.app.launcher
 & $AdbPath shell cmd package set-home-activity 'local.samsung.fixedlauncher/.MainActivity'
 & $AdbPath shell am start -a android.intent.action.MAIN -c android.intent.category.HOME
 
