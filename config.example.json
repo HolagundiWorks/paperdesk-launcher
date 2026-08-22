@@ -3,5 +3,6 @@
   "flash_enabled": false,
   "flash_backend": "",
   "flash_arguments": ["flash", "--AP", "{patched_ap}"],
-  "workspace": "workspace"
+  "workspace": "workspace",
+  "sync_library": "library"
 }

@@ -1,5 +1,7 @@
 # Samsung Root Manager
 
+The repository also includes `run-sync.ps1`, an offline Carbon-styled USB companion for Gallery, Notes, PDF, and EPUB libraries. See `docs/DESKTOP_SYNC.md`.
+
 A safety-oriented Windows utility for inspecting Samsung devices and firmware, preparing a Magisk workflow, entering Download Mode, and verifying root.
 
 This project does **not** exploit devices, bypass FRP, or unlock a bootloader. Samsung bootloader unlocking is a destructive, model/region-dependent action that must be completed by the owner on the device. Flashing is deliberately gated and disabled by default.

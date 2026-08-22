@@ -8,6 +8,7 @@ DEFAULT = {
     "flash_backend": "",
     "flash_arguments": ["flash", "--AP", "{patched_ap}"],
     "workspace": "workspace",
+    "sync_library": "library",
 }
 
 
