@@ -7,3 +7,4 @@ workspace/
 .venv/
 dist/
 /build-output/
+/android/black-wallpaper/out/
