@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
+import android.os.BatteryManager;
 import android.os.SystemClock;
 import android.view.*;
 import java.text.SimpleDateFormat;
@@ -17,12 +18,13 @@ final class FixedGridView extends View {
     private static final String[] ICONS={"fossify_gallery","fossify_calendar","fossify_clock","fossify_notes","tasks","fossify_calculator","fossify_filemanager"};
     private static final String ICON_PACK="com.donnnno.arcticons";
     private final PackageManager pm;
+    private final BatteryManager battery;
     private final Paint fill=new Paint(1), line=new Paint(1);
     private float scroll,downX,downY,startScroll; private long downAt,endAt,lastClockTap;
     private boolean dockTouch,clockTouch,ringTouch,running; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER;
     private final Runnable singleTap=new Runnable(){public void run(){toggle();}};
 
-    FixedGridView(Context c){super(c);pm=c.getPackageManager();setBackgroundColor(Color.BLACK);setWillNotDraw(false);line.setStyle(Paint.Style.STROKE);line.setStrokeCap(Paint.Cap.ROUND);}
+    FixedGridView(Context c){super(c);pm=c.getPackageManager();battery=(BatteryManager)c.getSystemService(Context.BATTERY_SERVICE);setBackgroundColor(Color.BLACK);setWillNotDraw(false);line.setStyle(Paint.Style.STROKE);line.setStrokeCap(Paint.Cap.ROUND);}
 
     protected void onDraw(Canvas c){super.onDraw(c);tick();clock(c);date(c);dock(c);postInvalidateDelayed(1000);}
 
@@ -36,6 +38,9 @@ final class FixedGridView extends View {
         Calendar now=Calendar.getInstance();float sec=now.get(Calendar.SECOND),min=now.get(Calendar.MINUTE)+sec/60,hour=now.get(Calendar.HOUR)+min/60;
         hand(c,x,y,r*.5f,hour*30-90,dp(4),Color.WHITE);hand(c,x,y,r*.72f,min*6-90,dp(3),Color.WHITE);hand(c,x,y,r*.78f,sec*6-90,dp(1),Color.rgb(255,92,53));
         fill.setColor(Color.rgb(255,92,53));c.drawCircle(x,y,dp(4),fill);
+        int level=battery==null?0:battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        fill.setTypeface(Typeface.create("sans",Typeface.NORMAL));fill.setTextAlign(Paint.Align.CENTER);fill.setTextSize(dp(15));fill.setColor(Color.rgb(198,198,198));
+        c.drawText(level+"%",x,y+r*.48f,fill);
         fill.setTypeface(Typeface.create("sans",0));fill.setTextAlign(Paint.Align.CENTER);fill.setTextSize(dp(13));fill.setColor(Color.rgb(198,198,198));long t=Math.max(0,remaining/1000);
         c.drawText(String.format(Locale.US,"%02d:%02d · Pomodoro",t/60,t%60),x,y+r+dp(35),fill);
     }
