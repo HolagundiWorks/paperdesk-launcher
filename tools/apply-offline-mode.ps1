@@ -10,6 +10,8 @@ if ($LASTEXITCODE -ne 0) { throw 'An authorized ADB device is required.' }
 & $AdbPath shell cmd location set-location-enabled --user 0 false
 & $AdbPath shell settings put global wifi_scan_always_enabled 0
 & $AdbPath shell settings put global ble_scan_always_enabled 0
+& $AdbPath shell settings put global wifi_on 0
+& $AdbPath shell settings put global bluetooth_on 0
 & $AdbPath shell settings put global mobile_data 0
 & $AdbPath shell cmd connectivity airplane-mode enable
 Write-Host 'Offline mode applied. USB and ADB were not changed.'
