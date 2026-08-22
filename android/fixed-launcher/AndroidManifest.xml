@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="local.samsung.fixedlauncher">
     <queries>
+        <package android:name="com.donnnno.arcticons" />
         <package android:name="org.fossify.gallery" />
         <package android:name="org.fossify.calendar" />
         <package android:name="org.fossify.clock" />

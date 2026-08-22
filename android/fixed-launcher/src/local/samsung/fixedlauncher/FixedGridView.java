@@ -2,6 +2,7 @@ package local.samsung.fixedlauncher;
 
 import android.content.*;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
@@ -12,6 +13,8 @@ import java.util.*;
 final class FixedGridView extends View {
     private static final long TOTAL=1500000L;
     private static final String[] APPS={"org.fossify.gallery","org.fossify.calendar","org.fossify.clock","org.fossify.notes","org.tasks","org.fossify.math","org.fossify.filemanager"};
+    private static final String[] ICONS={"fossify_gallery","fossify_calendar","fossify_clock","fossify_notes","tasks","fossify_calculator","fossify_filemanager"};
+    private static final String ICON_PACK="com.donnnno.arcticons";
     private final PackageManager pm;
     private final Paint fill=new Paint(1), line=new Paint(1);
     private float scroll,downX,downY,startScroll; private long downAt,endAt;
@@ -37,8 +40,8 @@ final class FixedGridView extends View {
 
     private void date(Canvas c){float x=getWidth()*.29f,y=getHeight()*.29f,r=Math.min(dp(76),getWidth()*.19f);fill.setTypeface(Typeface.create("sans",0));fill.setTextAlign(Paint.Align.LEFT);fill.setTextSize(dp(20));fill.setColor(Color.WHITE);c.drawText(new SimpleDateFormat("dd MMMM yyyy",Locale.getDefault()).format(new Date()),x+r+dp(24),y+dp(7),fill);}
 
-    private void dock(Canvas c){RectF d=dockRect();float cell=d.width()/5;c.save();c.clipRect(d);c.translate(-scroll,0);for(int i=0;i<APPS.length;i++){float l=d.left+i*cell;RectF tile=new RectF(l+dp(4),d.top+dp(4),l+cell-dp(4),d.bottom-dp(4));fill.setColor(Color.rgb(22,22,22));c.drawRoundRect(tile,dp(4),dp(4),fill);line.setStrokeWidth(dp(1));line.setColor(Color.rgb(57,57,57));c.drawRoundRect(tile,dp(4),dp(4),line);icon(c,APPS[i],tile);}c.restore();}
-    private void icon(Canvas c,String p,RectF t){try{Drawable d=pm.getApplicationIcon(p);int z=Math.round(Math.min(t.width(),t.height())*.56f),l=Math.round(t.centerX()-z/2f),top=Math.round(t.centerY()-z/2f);d.setBounds(l,top,l+z,top+z);d.draw(c);}catch(PackageManager.NameNotFoundException ignored){}}
+    private void dock(Canvas c){RectF d=dockRect();float cell=d.width()/5;c.save();c.clipRect(d);c.translate(-scroll,0);for(int i=0;i<APPS.length;i++){float l=d.left+i*cell;RectF slot=new RectF(l,d.top,l+cell,d.bottom);icon(c,i,slot);}c.restore();}
+    private void icon(Canvas c,int index,RectF t){try{Resources r=pm.getResourcesForApplication(ICON_PACK);int id=r.getIdentifier(ICONS[index],"drawable",ICON_PACK);Drawable d=id==0?pm.getApplicationIcon(APPS[index]):r.getDrawable(id,null);int z=Math.round(Math.min(t.width(),t.height())*.58f),l=Math.round(t.centerX()-z/2f),top=Math.round(t.centerY()-z/2f);d.setBounds(l,top,l+z,top+z);d.draw(c);}catch(Exception ignored){}}
     private RectF dockRect(){float b=getHeight()-dp(28);return new RectF(dp(8),b-dp(86),getWidth()-dp(8),b);}
 
     public boolean onTouchEvent(MotionEvent e){float cx=getWidth()*.29f,cy=getHeight()*.29f,cr=Math.min(dp(95),getWidth()*.24f);switch(e.getActionMasked()){
