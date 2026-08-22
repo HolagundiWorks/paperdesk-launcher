@@ -21,13 +21,13 @@ final class FixedGridView extends View {
     private final BatteryManager battery;
     private final Paint fill=new Paint(1), line=new Paint(1);
     private float scroll,downX,downY,startScroll; private long downAt,endAt,lastClockTap;
-    private boolean dockTouch,clockTouch,ringTouch,running,locked=true,unlockTouch; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER;
+    private boolean dockTouch,clockTouch,ringTouch,running,locked=true,unlockTouch,unlockPromptVisible; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER,lastLockTap;
     private float unlockStartX;
     private final Runnable singleTap=new Runnable(){public void run(){toggle();}};
 
     FixedGridView(Context c){super(c);pm=c.getPackageManager();battery=(BatteryManager)c.getSystemService(Context.BATTERY_SERVICE);setBackgroundColor(Color.BLACK);setWillNotDraw(false);line.setStyle(Paint.Style.STROKE);line.setStrokeCap(Paint.Cap.ROUND);}
 
-    protected void onDraw(Canvas c){super.onDraw(c);tick();clock(c);date(c);if(locked)unlockAnimation(c);else dock(c);postInvalidateDelayed(locked?33:1000);}
+    protected void onDraw(Canvas c){super.onDraw(c);tick();clock(c);date(c);if(locked&&unlockPromptVisible)unlockAnimation(c);else if(!locked)dock(c);postInvalidateDelayed(locked&&unlockPromptVisible?33:1000);}
 
     private void clock(Canvas c){
         float x=clockX(),y=clockY(),r=clockRadius();
@@ -64,8 +64,8 @@ final class FixedGridView extends View {
         case MotionEvent.ACTION_UP:float travel=dist(downX,downY,e.getX(),e.getY());if(ringTouch){setTimerFromDial(e.getX(),e.getY(),cx,cy);}else if(clockTouch&&travel<dp(12)){clockTap();}else if(dockTouch&&travel<dp(10)){int i=(int)((e.getX()-dockRect().left+scroll)/(dockRect().width()/5));if(i>=0&&i<APPS.length)launch(APPS[i]);}dockTouch=clockTouch=ringTouch=false;return true;
         case MotionEvent.ACTION_CANCEL:dockTouch=clockTouch=ringTouch=false;return true;default:return false;}}
 
-    private boolean lockTouch(MotionEvent e){switch(e.getActionMasked()){case MotionEvent.ACTION_DOWN:unlockStartX=e.getX();unlockTouch=e.getY()>getHeight()*.72f;return true;case MotionEvent.ACTION_MOVE:if(unlockTouch)invalidate();return true;case MotionEvent.ACTION_UP:if(unlockTouch&&e.getX()-unlockStartX>getWidth()*.32f){locked=false;performHapticFeedback(HapticFeedbackConstants.CONFIRM);invalidate();}unlockTouch=false;return true;case MotionEvent.ACTION_CANCEL:unlockTouch=false;return true;default:return false;}}
-    void lock(){locked=true;unlockTouch=false;invalidate();}
+    private boolean lockTouch(MotionEvent e){switch(e.getActionMasked()){case MotionEvent.ACTION_DOWN:downX=e.getX();downY=e.getY();unlockStartX=e.getX();unlockTouch=unlockPromptVisible&&e.getY()>getHeight()*.78f&&e.getX()<getWidth()*.4f;return true;case MotionEvent.ACTION_MOVE:if(unlockTouch)invalidate();return true;case MotionEvent.ACTION_UP:if(unlockTouch&&e.getX()>getWidth()*.65f&&Math.abs(e.getY()-downY)<dp(60)){locked=false;unlockPromptVisible=false;performHapticFeedback(HapticFeedbackConstants.CONFIRM);invalidate();}else if(!unlockPromptVisible&&dist(downX,downY,e.getX(),e.getY())<dp(12)){long now=SystemClock.uptimeMillis();if(now-lastLockTap<=1500){unlockPromptVisible=true;lastLockTap=0;performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);invalidate();}else lastLockTap=now;}unlockTouch=false;return true;case MotionEvent.ACTION_CANCEL:unlockTouch=false;return true;default:return false;}}
+    void lock(){locked=true;unlockTouch=false;unlockPromptVisible=false;lastLockTap=0;invalidate();}
 
     private float clamp(float v){return Math.max(0,Math.min((APPS.length-5)*dockRect().width()/5,v));}
     private void clockTap(){long now=SystemClock.uptimeMillis();if(now-lastClockTap<=1500){removeCallbacks(singleTap);lastClockTap=0;reset();}else{lastClockTap=now;removeCallbacks(singleTap);postDelayed(singleTap,300);}}
