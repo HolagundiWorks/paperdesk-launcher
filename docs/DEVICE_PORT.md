@@ -15,14 +15,14 @@ This plan establishes a reproducible AOSP-derived baseline before removing hardw
 | Item | Current state | Evidence source |
 |---|---|---|
 | Model | owner reports `SM-A107F/DS`; verify | label, Download Mode, properties |
-| Product/device/board | unknown | `ro.product.*`, recovery logs |
-| CSC and build fingerprint | unknown | properties, firmware |
-| Bootloader string/revision | unknown | Download Mode, property, filenames |
-| SoC/kernel/config | unknown until verified | procfs, boot image, published source |
-| Partition/dynamic layout | unknown | fstab, firmware metadata, block map |
-| A/B update model | unknown | properties, fstab/update metadata |
-| Treble/VNDK/vendor HALs | unknown | properties and vendor manifests |
-| Encryption/metadata layout | unknown | fstab and recovery evidence |
+| Product/device/board | `a10s` / `S96116RA1` observed | [baseline](evidence/A107F_BASELINE_2026-08-22.md) |
+| CSC and build | `INS` / `A107FXXS8CWD3` observed | baseline |
+| Bootloader | `A107FXXS8CWD3`, locked | baseline; revision interpretation pending firmware intake |
+| SoC/kernel | `mt6765` platform, `mt6762` hardware, kernel 4.19.127 observed | baseline; config/source pending |
+| Partition/dynamic layout | dedicated partitions observed; dynamic property empty | baseline; fstab/images pending |
+| A/B update model | A/B property empty | baseline; metadata confirmation pending |
+| Treble/VNDK/vendor HALs | Treble true / VNDK 30 | baseline; manifests pending |
+| Encryption/metadata layout | file-based encryption observed | baseline; fstab pending |
 | Display/touch/USB components | unknown | DT, kernel logs, manifests |
 | Unlock availability/state | unknown | Developer options, Download Mode |
 
