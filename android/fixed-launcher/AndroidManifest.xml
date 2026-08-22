@@ -10,6 +10,7 @@
         <package android:name="org.fossify.math" />
         <package android:name="org.fossify.filemanager" />
         <package android:name="ua.acclorite.book_story" />
+        <package android:name="local.samsung.permissionmanager" />
     </queries>
     <application
         android:allowBackup="false"
