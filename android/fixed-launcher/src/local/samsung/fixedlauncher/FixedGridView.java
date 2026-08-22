@@ -11,14 +11,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 final class FixedGridView extends View {
-    private static final long TOTAL=1500000L;
+    private static final long DEFAULT_TIMER=1200000L;
+    private static final long MAX_TIMER=3600000L;
     private static final String[] APPS={"org.fossify.gallery","org.fossify.calendar","org.fossify.clock","org.fossify.notes","org.tasks","org.fossify.math","org.fossify.filemanager"};
     private static final String[] ICONS={"fossify_gallery","fossify_calendar","fossify_clock","fossify_notes","tasks","fossify_calculator","fossify_filemanager"};
     private static final String ICON_PACK="com.donnnno.arcticons";
     private final PackageManager pm;
     private final Paint fill=new Paint(1), line=new Paint(1);
-    private float scroll,downX,downY,startScroll; private long downAt,endAt;
-    private boolean dockTouch,clockTouch,running; private long remaining=TOTAL;
+    private float scroll,downX,downY,startScroll; private long downAt,endAt,lastClockTap;
+    private boolean dockTouch,clockTouch,ringTouch,running; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER;
+    private final Runnable singleTap=new Runnable(){public void run(){toggle();}};
 
     FixedGridView(Context c){super(c);pm=c.getPackageManager();setBackgroundColor(Color.BLACK);setWillNotDraw(false);line.setStyle(Paint.Style.STROKE);line.setStrokeCap(Paint.Cap.ROUND);}
 
@@ -27,7 +29,7 @@ final class FixedGridView extends View {
     private void clock(Canvas c){
         float x=getWidth()*.29f,y=getHeight()*.29f,r=Math.min(dp(76),getWidth()*.19f);
         line.setStrokeWidth(dp(2));line.setColor(Color.rgb(57,57,57));c.drawCircle(x,y,r,line);
-        float f=Math.max(0,Math.min(1,remaining/(float)TOTAL)),sweep=360*f;
+        float f=Math.max(0,Math.min(1,remaining/(float)MAX_TIMER)),sweep=360*f;
         line.setStrokeWidth(dp(3));line.setColor(Color.rgb(255,92,53));
         RectF ring=new RectF(x-r-dp(7),y-r-dp(7),x+r+dp(7),y+r+dp(7));c.drawArc(ring,-90,sweep,false,line);
         double e=Math.toRadians(-90+sweep);fill.setColor(Color.rgb(255,92,53));c.drawCircle(x+(r+dp(7))*(float)Math.cos(e),y+(r+dp(7))*(float)Math.sin(e),dp(4),fill);
@@ -44,15 +46,17 @@ final class FixedGridView extends View {
     private void icon(Canvas c,int index,RectF t){try{Resources r=pm.getResourcesForApplication(ICON_PACK);int id=r.getIdentifier(ICONS[index],"drawable",ICON_PACK);Drawable d=id==0?pm.getApplicationIcon(APPS[index]):r.getDrawable(id,null);int z=Math.round(Math.min(t.width(),t.height())*.58f),l=Math.round(t.centerX()-z/2f),top=Math.round(t.centerY()-z/2f);d.setBounds(l,top,l+z,top+z);d.draw(c);}catch(Exception ignored){}}
     private RectF dockRect(){float b=getHeight()-dp(28);return new RectF(dp(8),b-dp(86),getWidth()-dp(8),b);}
 
-    public boolean onTouchEvent(MotionEvent e){float cx=getWidth()*.29f,cy=getHeight()*.29f,cr=Math.min(dp(95),getWidth()*.24f);switch(e.getActionMasked()){
-        case MotionEvent.ACTION_DOWN:downX=e.getX();downY=e.getY();downAt=SystemClock.uptimeMillis();startScroll=scroll;dockTouch=dockRect().contains(downX,downY);clockTouch=dist(downX,downY,cx,cy)<=cr;return true;
-        case MotionEvent.ACTION_MOVE:if(dockTouch){scroll=clamp(startScroll+downX-e.getX());invalidate();}return true;
-        case MotionEvent.ACTION_UP:float travel=dist(downX,downY,e.getX(),e.getY());if(clockTouch&&travel<dp(12)){if(SystemClock.uptimeMillis()-downAt>=650)reset();else toggle();}else if(dockTouch&&travel<dp(10)){int i=(int)((e.getX()-dockRect().left+scroll)/(dockRect().width()/5));if(i>=0&&i<APPS.length)launch(APPS[i]);}dockTouch=clockTouch=false;return true;
-        case MotionEvent.ACTION_CANCEL:dockTouch=clockTouch=false;return true;default:return false;}}
+    public boolean onTouchEvent(MotionEvent e){float cx=getWidth()*.29f,cy=getHeight()*.29f,r=Math.min(dp(76),getWidth()*.19f),distance=dist(e.getX(),e.getY(),cx,cy);switch(e.getActionMasked()){
+        case MotionEvent.ACTION_DOWN:downX=e.getX();downY=e.getY();downAt=SystemClock.uptimeMillis();startScroll=scroll;ringTouch=Math.abs(distance-(r+dp(7)))<=dp(22);dockTouch=!ringTouch&&dockRect().contains(downX,downY);clockTouch=!ringTouch&&distance<=r;return true;
+        case MotionEvent.ACTION_MOVE:if(ringTouch){setTimerFromDial(e.getX(),e.getY(),cx,cy);}else if(dockTouch){scroll=clamp(startScroll+downX-e.getX());invalidate();}return true;
+        case MotionEvent.ACTION_UP:float travel=dist(downX,downY,e.getX(),e.getY());if(ringTouch){setTimerFromDial(e.getX(),e.getY(),cx,cy);}else if(clockTouch&&travel<dp(12)){clockTap();}else if(dockTouch&&travel<dp(10)){int i=(int)((e.getX()-dockRect().left+scroll)/(dockRect().width()/5));if(i>=0&&i<APPS.length)launch(APPS[i]);}dockTouch=clockTouch=ringTouch=false;return true;
+        case MotionEvent.ACTION_CANCEL:dockTouch=clockTouch=ringTouch=false;return true;default:return false;}}
 
     private float clamp(float v){return Math.max(0,Math.min((APPS.length-5)*dockRect().width()/5,v));}
-    private void toggle(){tick();if(remaining<=0)remaining=TOTAL;running=!running;if(running)endAt=SystemClock.elapsedRealtime()+remaining;invalidate();}
-    private void reset(){running=false;remaining=TOTAL;invalidate();}
+    private void clockTap(){long now=SystemClock.uptimeMillis();if(now-lastClockTap<=1500){removeCallbacks(singleTap);lastClockTap=0;reset();}else{lastClockTap=now;removeCallbacks(singleTap);postDelayed(singleTap,300);}}
+    private void setTimerFromDial(float x,float y,float cx,float cy){double angle=Math.toDegrees(Math.atan2(y-cy,x-cx))+90;if(angle<=0)angle+=360;int minutes=Math.max(1,Math.min(60,(int)Math.round(angle/6)));running=false;configured=minutes*60000L;remaining=configured;invalidate();}
+    private void toggle(){tick();if(remaining<=0)remaining=configured;running=!running;if(running)endAt=SystemClock.elapsedRealtime()+remaining;invalidate();}
+    private void reset(){running=false;remaining=configured;invalidate();}
     private void tick(){if(running){remaining=Math.max(0,endAt-SystemClock.elapsedRealtime());if(remaining==0)running=false;}}
     private void hand(Canvas c,float x,float y,float len,float deg,float w,int color){double a=Math.toRadians(deg);line.setStrokeWidth(w);line.setColor(color);c.drawLine(x,y,x+len*(float)Math.cos(a),y+len*(float)Math.sin(a),line);}
     private void launch(String p){Intent i=pm.getLaunchIntentForPackage(p);if(i!=null){i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);getContext().startActivity(i);}}

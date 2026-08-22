@@ -14,6 +14,7 @@ if ((& $AdbPath shell pm list packages com.donnnno.arcticons) -notmatch 'com\.do
 }
 & (Join-Path $project 'build.ps1')
 & $AdbPath install -r (Join-Path $project 'out\fixed-launcher.apk')
+& $AdbPath shell settings put system double_tap_to_sleep 0
 & $AdbPath shell cmd package set-home-activity 'local.samsung.fixedlauncher/.MainActivity'
 & $AdbPath shell am start -a android.intent.action.MAIN -c android.intent.category.HOME
 
