@@ -8,3 +8,4 @@ workspace/
 dist/
 /build-output/
 /android/black-wallpaper/out/
+/android/fixed-launcher/out/
