@@ -32,8 +32,8 @@ The upstream archived release does not provide a separately signed checksum. The
 
 ## Destructive-operation gates
 
-- [ ] User confirms all personal files and app data are backed up elsewhere.
-- [ ] Exact stock `A107FXXS8CWD3` BL/AP/CP/CSC package is retained and hashed.
+- [x] User confirms this is a development handset and no personal data must be retained.
+- [x] Exact stock `A107FXXS8CWD3` BL/AP/CP/CSC/HOME_CSC package is retained and verified.
 - [ ] Samsung USB/Odin recovery detection is tested.
 - [ ] Recovery/vbmeta files are sourced for the exact A107F Android 11/binary-8 baseline and hashed.
 - [ ] Recovery path to stock is documented and understood.
@@ -44,3 +44,15 @@ The upstream archived release does not provide a separately signed checksum. The
 ## Appliance hardening order
 
 First boot the unchanged vanilla GSI and validate display, touch, storage, USB, charging, suspend, and custom APK compatibility. Then disable radios and unused capabilities one class at a time, with a reboot/regression check after each change. Do not remove vendor HALs during the initial GSI installation.
+
+## Stock recovery package
+
+Downloaded directly from Samsung FUS for `SM-A107F`, region `INS`:
+
+`A107FXXS8CWD3/A107FODM8CVG2/A107FXXS8CVK1/A107FXXS8CWD3`
+
+Package SHA-256:
+
+`e7264f13890b1c3c6b446bbe25c4ddd1e8df0987bd1f25c0004c2c919cfc02af`
+
+All five embedded Odin `.tar.md5` component checks passed using `samloader-rs` 2.0.0. The recovery workspace is `D:\Samsung-A10s-Recovery`; it is intentionally outside Git because the firmware is large and redistribution terms may apply.
