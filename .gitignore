@@ -1,0 +1,23 @@
+.cache/
+.gradle/
+.kotlin/
+build/
+**/build/
+local.properties
+*.iml
+.idea/
+.DS_Store
+captures/
+*.apk
+*.ap_
+*.dex
+*.raw
+vendor/
+.tmp-shots/
+Viper*.zip
+**/node_modules/
+**/.madhwa-raw/
+
+# leftover capture files at the workspace root
+/*.png
+/ui.xml

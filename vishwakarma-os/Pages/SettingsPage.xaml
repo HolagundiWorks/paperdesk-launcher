@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PaperDesk_Companion.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:PaperDesk_Companion.Models">
+    <Grid Style="{StaticResource PageRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="OS settings" />
+        <Grid Grid.Row="1" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*" />
+                <ColumnDefinition Width="1.4*" />
+            </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource CardStyle}">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{x:Bind Session.FeatureFlags, Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:SettingFlag">
+                                <ToggleSwitch Header="{x:Bind Label}" IsOn="{x:Bind IsOn, Mode=TwoWay}" Margin="0,4" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="12">
+                <TextBox
+                    x:Name="PagesBox"
+                    Header="Launcher pages"
+                    PlaceholderText="desk schedule grantha" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="desk schedule grantha" />
+                <TextBox
+                    x:Name="JsonBox"
+                    MinHeight="280"
+                    AcceptsReturn="True"
+                    FontFamily="Cascadia Mono"
+                    Header="Settings JSON"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Click="Apply_Click" Content="Apply to phone" Style="{StaticResource AccentButtonStyle}" />
+            <Button Click="Profile_Click" Content="Acharya profile" />
+            <Button Click="SaveProfile_Click" Content="Save profile" />
+        </StackPanel>
+    </Grid>
+</Page>

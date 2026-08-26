@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PaperDesk_Companion.Pages.TodoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:PaperDesk_Companion.Controls">
+    <Grid Style="{StaticResource PageRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Todo" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="Drag cards between columns. Push to phone to sync." />
+            </StackPanel>
+            <CommandBar HorizontalAlignment="Right" DefaultLabelPosition="Right" OverflowButtonVisibility="Collapsed">
+                <AppBarButton Click="New_Click" Icon="Add" Label="New" />
+                <AppBarButton Click="Edit_Click" Icon="Edit" Label="Edit" />
+                <AppBarButton Click="Delete_Click" Icon="Delete" Label="Delete" />
+            </CommandBar>
+        </Grid>
+        <controls:TodoBoard x:Name="Board" Grid.Row="1" />
+    </Grid>
+</Page>

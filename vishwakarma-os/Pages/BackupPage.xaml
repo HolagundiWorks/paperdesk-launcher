@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PaperDesk_Companion.Pages.BackupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:PaperDesk_Companion.Models">
+    <Grid Style="{StaticResource PageRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Backup and restore" />
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,8,0,0">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{x:Bind Session.BackupFlags, Mode=OneWay}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:SettingFlag">
+                            <CheckBox Content="{x:Bind Label}" IsChecked="{x:Bind IsOn, Mode=TwoWay}" Margin="0,4" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Click="Backup_Click" Content="Backup" Style="{StaticResource AccentButtonStyle}" />
+            <Button Click="Data_Click" Content="Restore data" />
+            <Button Click="Config_Click" Content="Restore config" />
+            <Button Click="Full_Click" Content="Full restore" />
+        </StackPanel>
+    </Grid>
+</Page>

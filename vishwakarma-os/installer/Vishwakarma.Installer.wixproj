@@ -1,0 +1,14 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <OutputName>Vishwakarma</OutputName>
+    <SuppressValidation>false</SuppressValidation>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\</PublishDir>
+    <AssetsDir Condition="'$(AssetsDir)' == ''">$(MSBuildThisFileDirectory)..\Assets\</AssetsDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <BindPath Include="$(PublishDir)" BindName="publish" />
+    <BindPath Include="$(AssetsDir)" BindName="assets" />
+  </ItemGroup>
+</Project>

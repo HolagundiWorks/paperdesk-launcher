@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Vishwakarma (Unpackaged)": {
+      "commandName": "Project"
+    },
+    "Vishwakarma (Package)": {
+      "commandName": "MsixPackage"
+    }
+  }
+}
