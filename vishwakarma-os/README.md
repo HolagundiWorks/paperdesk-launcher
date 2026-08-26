@@ -1,6 +1,10 @@
 # Vishwakarma OS
 
-Windows companion, USB protocol, and device layer for the phone that runs Acharya OS.
+Samsung A10s (`SM-A107F/DS`) OS flavor, device customization, USB protocol, and
+Windows companion.
+
+This is the earlier Samsung A10s work, now named **VishwakarmaOS**. AcharyaOS is
+the separate Samsung J2 flavor and is the current development focus.
 
 The companion app assembly name is **Vishwakarma**. It syncs over ADB into `/sdcard/Vishwakarma` on the device.
 
@@ -47,7 +51,7 @@ cd companion
 # needs JDK 17; use the Gradle wrapper from acharya-os or your IDE
 ```
 
-## Device / OS layer
+## Samsung A10s device / OS layer
 
 | Path | Role |
 | --- | --- |
@@ -65,4 +69,4 @@ Lockdown keeps USB debugging on. It does not disable Magisk or Settings.
 
 ## Related
 
-Phone launcher: [`../acharya-os/README.md`](../acharya-os/README.md).
+Current active flavor: [`../acharya-os/README.md`](../acharya-os/README.md).
