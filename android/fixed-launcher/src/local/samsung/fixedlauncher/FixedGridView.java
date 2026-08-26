@@ -27,7 +27,7 @@ final class FixedGridView extends View {
     private final BatteryManager battery;
     private final Paint fill=new Paint(1), line=new Paint(1);
     private float scroll,downX,downY,startScroll; private long downAt,endAt,lastClockTap;
-    private boolean dockTouch,clockTouch,ringTouch,running,timerSelected,locked=true,unlockTouch,unlockPromptVisible; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER,lastLockTap;
+    private boolean dockTouch,clockTouch,ringTouch,running,timerSelected,locked=false,unlockTouch,unlockPromptVisible; private long configured=DEFAULT_TIMER,remaining=DEFAULT_TIMER,lastLockTap;
     private float unlockStartX;
     private final Runnable singleTap=new Runnable(){public void run(){toggle();}};
 
@@ -73,7 +73,9 @@ final class FixedGridView extends View {
         case MotionEvent.ACTION_CANCEL:dockTouch=clockTouch=ringTouch=false;return true;default:return false;}}
 
     private boolean lockTouch(MotionEvent e){switch(e.getActionMasked()){case MotionEvent.ACTION_DOWN:downX=e.getX();downY=e.getY();unlockStartX=e.getX();unlockTouch=unlockPromptVisible&&e.getY()>getHeight()*.78f&&e.getX()<getWidth()*.4f;return true;case MotionEvent.ACTION_MOVE:if(unlockTouch)invalidate();return true;case MotionEvent.ACTION_UP:if(unlockTouch&&e.getX()>getWidth()*.65f&&Math.abs(e.getY()-downY)<dp(60)){locked=false;unlockPromptVisible=false;performHapticFeedback(HapticFeedbackConstants.CONFIRM);invalidate();}else if(!unlockPromptVisible&&dist(downX,downY,e.getX(),e.getY())<dp(12)){long now=SystemClock.uptimeMillis();if(now-lastLockTap<=1500){unlockPromptVisible=true;lastLockTap=0;performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);invalidate();}else lastLockTap=now;}unlockTouch=false;return true;case MotionEvent.ACTION_CANCEL:unlockTouch=false;return true;default:return false;}}
-    void lock(){locked=true;unlockTouch=false;unlockPromptVisible=false;lastLockTap=0;invalidate();}
+    // Android's real keyguard owns lock/unlock. Keeping a second launcher lock
+    // caused the dashboard to disappear after screen-off with no visible affordance.
+    void lock(){locked=false;unlockTouch=false;unlockPromptVisible=false;lastLockTap=0;invalidate();}
 
     private float clamp(float v){return Math.max(0,Math.min((APPS.length-5)*dockRect().width()/5,v));}
     private int timerColor(){if(!timerSelected&&!running)return CARBON_NEUTRAL;if(remaining<=0)return CARBON_SUCCESS;if(running&&remaining<=60000L)return CARBON_ERROR;if(running&&remaining<=300000L)return CARBON_WARNING;return CARBON_CAUTION_MAJOR;}
