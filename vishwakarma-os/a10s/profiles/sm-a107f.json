@@ -1,0 +1,17 @@
+{
+  "id": "samsung-a10s-sm-a107f",
+  "display_name": "Samsung Galaxy A10s",
+  "models": ["SM-A107F", "SM-A107F/DS"],
+  "firmware_models": ["A107F"],
+  "transport": "samsung_download",
+  "patch_strategy": "magisk_full_ap",
+  "patch_target": "Complete AP archive (Magisk selects the required boot/recovery images)",
+  "flash_slots": ["BL", "AP", "CP", "CSC"],
+  "notes": [
+    "The /DS suffix is a dual-SIM sales variant; official firmware packages normally identify this family as A107F.",
+    "Use Samsung Download Mode/Odin protocol; do not assume standard Android fastboot support.",
+    "Patch the complete AP tar in Magisk instead of extracting and patching a guessed image manually.",
+    "Bootloader unlocking, when offered by the installed firmware and region, must be performed by the owner and normally wipes user data.",
+    "Do not flash A107M, A107G, A107N, or another A10s regional model package on an A107F device."
+  ]
+}

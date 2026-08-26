@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+config.json
+logs/
+workspace/
+/evidence/
+.venv/
+dist/
+/build-output/
+/android/black-wallpaper/out/
+/android/fixed-launcher/out/
