@@ -6,6 +6,16 @@ Windows companion.
 This is the earlier Samsung A10s work, now named **VishwakarmaOS**. AcharyaOS is
 the separate Samsung J2 flavor and is the current development focus.
 
+## Layout
+
+| Path | Role |
+| --- | --- |
+| `a10s/` | Imported A10s manager, Android utilities, profiles, recovery docs, and tests |
+| `device/` | Deployment, lockdown, and restore scripts |
+| `os/` | Device overlay, boot animation, and init assets |
+| `companion/` | Optional Kotlin USB companion |
+| repository root | WinUI 3 Vishwakarma desktop companion |
+
 The companion app assembly name is **Vishwakarma**. It syncs over ADB into `/sdcard/Vishwakarma` on the device.
 
 ## Windows companion

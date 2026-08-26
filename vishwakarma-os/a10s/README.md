@@ -1,4 +1,8 @@
-# Samsung Root Manager
+# VishwakarmaOS A10s Tooling
+
+Samsung Root Manager and Android appliance utilities for the Samsung Galaxy
+A10s (`SM-A107F/DS`). This project was imported into the VishwakarmaOS flavor
+with its original Git history preserved.
 
 The repository also includes `run-sync.ps1`, an offline Carbon-styled USB companion for Gallery, Notes, PDF, and EPUB libraries. See `docs/DESKTOP_SYNC.md`.
 

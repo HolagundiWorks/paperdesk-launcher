@@ -17,6 +17,9 @@ vendor/
 Viper*.zip
 **/node_modules/
 **/.madhwa-raw/
+*.msi
+/local-artifacts/duplicates/
+/local-artifacts/acharya/upstream-sources/
 
 # leftover capture files at the workspace root
 /*.png

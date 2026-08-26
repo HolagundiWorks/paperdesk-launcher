@@ -6,13 +6,27 @@ launcher and USB-sync concepts, but are developed and released independently.
 | Flavor | Target device | Folder | Purpose |
 | --- | --- | --- |
 | **AcharyaOS** | Samsung Galaxy J2 (`SM-J320M`) | [`acharya-os/`](acharya-os/) | Landscape launcher and focused daily environment for dharma, reading, scheduling, notes, and desk tools |
-| **VishwakarmaOS** | Samsung Galaxy A10s (`SM-A107F/DS`) | [`vishwakarma-os/`](vishwakarma-os/) | Existing A10s OS/device customization, lockdown tooling, USB protocol, and Windows companion |
+| **VishwakarmaOS** | Samsung Galaxy A10s (`SM-A107F/DS`) | [`vishwakarma-os/`](vishwakarma-os/) | A10s OS/device customization, rooting and recovery tools, USB protocol, and Windows companion |
 
 > **Current development focus:** AcharyaOS.
 
 This git root is the shared workspace. Each flavor has its own README and build
 instructions. Device-specific behavior must stay inside the corresponding
 folder unless it is deliberately extracted as shared code.
+
+## Repository layout
+
+```text
+paperdesk/
+├── acharya-os/                 # Active Samsung J2 Android flavor
+│   └── resources/reference/    # Curated source documents and catalogues
+├── vishwakarma-os/             # Samsung A10s flavor
+│   ├── a10s/                   # A10s manager, Android utilities, profiles and docs
+│   ├── device/                 # Deployment and lockdown scripts
+│   ├── os/                     # Overlay, boot animation and init assets
+│   └── companion/              # Optional Kotlin USB companion
+└── local-artifacts/            # Ignored local APK/MSI binaries; never source
+```
 
 ## Acharya OS
 
