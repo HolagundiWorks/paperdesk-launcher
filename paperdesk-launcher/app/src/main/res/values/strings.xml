@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Paperdesk</string>
+    <string name="greeting">Your workspace is ready.</string>
+    <string name="workspace_name">PAPERDESK · HUMAN CENTRIC WORKS</string>
+    <string name="all_apps">APPLICATIONS</string>
+    <string name="madhvanidhi">MADHVANIDHI</string>
+    <string name="calculator">CALCULATOR</string>
+    <string name="pomodoro">POMODORO</string>
+    <string name="make_default">MAKE PAPERDESK DEFAULT</string>
+    <string name="default_launcher_active">PAPERDESK IS THE DEFAULT HOME</string>
+    <string name="app_not_installed">This Paperdesk app is not installed.</string>
+    <string name="app_unavailable">This application cannot be opened.</string>
+</resources>
