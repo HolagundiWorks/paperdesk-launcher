@@ -32,6 +32,7 @@ public class CustomDrawableFactory extends DynamicDrawableFactory implements Run
     String iconPack;
     Resources iconPackResources;
     final Map<ComponentName, Integer> packComponents = new HashMap<>();
+    final Map<ComponentName, String> packDrawables = new HashMap<>();
     final Map<ComponentName, String> packCalendars = new HashMap<>();
     final Map<Integer, CustomClock.Metadata> packClocks = new HashMap<>();
 
@@ -70,6 +71,7 @@ public class CustomDrawableFactory extends DynamicDrawableFactory implements Run
             mRegistered = false;
         }
         packComponents.clear();
+        packDrawables.clear();
         packCalendars.clear();
         packClocks.clear();
         if (CustomIconUtils.usingValidPack(mContext)) {
@@ -93,12 +95,12 @@ public class CustomDrawableFactory extends DynamicDrawableFactory implements Run
     public FastBitmapDrawable newIcon(Bitmap icon, ItemInfo info) {
         ensureInitialLoadComplete();
         ComponentName componentName = info.getTargetComponent();
-        if (packComponents.containsKey(info.getTargetComponent()) &&
+        if ((packDrawables.containsKey(componentName) || packComponents.containsKey(componentName)) &&
                 CustomIconProvider.isEnabledForApp(mContext, new ComponentKey(componentName, info.user))) {
             if (Utilities.ATLEAST_OREO &&
                     info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
                     info.user.equals(Process.myUserHandle())) {
-                int drawableId = packComponents.get(componentName);
+                int drawableId = resolveDrawable(componentName);
                 if (packClocks.containsKey(drawableId)) {
                     Drawable drawable = iconPackResources.getDrawable(drawableId);
                     return mCustomClockDrawer.drawIcon(icon, drawable, packClocks.get(drawableId));
@@ -107,5 +109,14 @@ public class CustomDrawableFactory extends DynamicDrawableFactory implements Run
             return new FastBitmapDrawable(icon);
         }
         return super.newIcon(icon, info);
+    }
+
+    int resolveDrawable(ComponentName componentName) {
+        if (packComponents.containsKey(componentName)) {
+            return packComponents.get(componentName);
+        }
+        String drawableName = packDrawables.get(componentName);
+        if (drawableName == null || iconPackResources == null) return 0;
+        return iconPackResources.getIdentifier(drawableName, "drawable", iconPack);
     }
 }

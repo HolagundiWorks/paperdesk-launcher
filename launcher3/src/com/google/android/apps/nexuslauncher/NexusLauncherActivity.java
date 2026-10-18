@@ -20,7 +20,7 @@ import java.util.List;
 public class NexusLauncherActivity extends Launcher {
     private final static String PREF_IS_RELOAD = "pref_reload_workspace";
     private final static String PREF_BUILT_IN_ICON_VERSION = "paperdesk_builtin_icon_version";
-    private final static int BUILT_IN_ICON_VERSION = 1561;
+    private final static int BUILT_IN_ICON_VERSION = 1562;
     private NexusLauncher mLauncher;
     private boolean mIsReload;
     private String mThemeHints;

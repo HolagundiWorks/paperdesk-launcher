@@ -1,0 +1,21 @@
+Paperdesk Launcher
+Copyright 2026 Holagundi Consulting Works
+
+This project is open source under the Apache License, Version 2.0.
+The license text is in the LICENSE file.
+
+Launcher3 code is derived from the Android Open Source Project and the
+Rootless Pixel Launcher. That code remains under the Apache License,
+Version 2.0. See launcher3/LICENSE.
+
+Arcticons icons are inherited, not forked. Paperdesk Launcher does not
+maintain a fork of https://github.com/Arcticons-Team/Arcticons and does
+not track that repository as an upstream. Arcticons 15.0.5 is bundled
+only as an icon archive:
+
+- Icon artwork: Creative Commons Attribution-ShareAlike 4.0
+- Arcticons application archive: GNU General Public License v3.0
+- Attribution: launcher3/assets/ARCTICONS_NOTICE.txt
+- GPL text: launcher3/assets/ARCTICONS_GPL-3.0.txt
+
+Copyright and attribution for those icons belong to the Arcticons contributors.

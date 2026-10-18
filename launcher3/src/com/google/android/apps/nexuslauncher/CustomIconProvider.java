@@ -103,11 +103,13 @@ public class CustomIconProvider extends DynamicIconProvider {
                     }
                 } catch (Resources.NotFoundException ignored) {
                 }
-            } else if (mFactory.packComponents.containsKey(component)) {
-                int drawableId = mFactory.packComponents.get(component);
-                drawable = mFactory.iconPackResources.getDrawableForDensity(drawableId, iconDpi);
-                if (Utilities.ATLEAST_OREO && mFactory.packClocks.containsKey(drawableId)) {
-                    drawable = CustomClock.getClock(mContext, drawable, mFactory.packClocks.get(drawableId), iconDpi);
+            } else if (mFactory.packDrawables.containsKey(component) || mFactory.packComponents.containsKey(component)) {
+                int drawableId = mFactory.resolveDrawable(component);
+                if (drawableId != 0) {
+                    drawable = mFactory.iconPackResources.getDrawableForDensity(drawableId, iconDpi);
+                    if (Utilities.ATLEAST_OREO && mFactory.packClocks.containsKey(drawableId)) {
+                        drawable = CustomClock.getClock(mContext, drawable, mFactory.packClocks.get(drawableId), iconDpi);
+                    }
                 }
             }
         }

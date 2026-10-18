@@ -6,6 +6,8 @@ earlier device-specific projects. It merges
 [HolagundiWorks/Launcher3](https://github.com/HolagundiWorks/Launcher3)
 (`paperdesk-custom`).
 
+Project code is Apache 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
 | Flavor | Target device | Folder | Purpose |
 | --- | --- | --- | --- |
 | **Paperdesk Launcher** | Android 7.1+ phones and tablets | [`paperdesk-launcher/`](paperdesk-launcher/) | Adaptive HOME launcher with a focused app list and first-class shortcuts for the Human Centric Works app family |
@@ -53,10 +55,13 @@ Keep the device's existing launcher installed until Paperdesk has been tested.
 ## Rootless Paperdesk
 
 Rootless Paperdesk (`in.hcworks.paperdesk.rootless`) is the Pixel-style HOME
-launcher brought in from Launcher3 branch `paperdesk-custom`. Its Paperdesk
-changes bundle Arcticons, keep the icon treatment dark and circular, pin
-Panchanga on the home screen, and remove the fixed search bar, Smartspace, and
-suggested apps.
+launcher brought in from Launcher3 branch `paperdesk-custom`. It inherits the
+Arcticons 15.0.5 icon library from the bundled archive and applies that full
+map, including calendar and clock icons. Paperdesk Launcher is not a fork of
+Arcticons. Icon artwork stays under CC BY-SA 4.0 and is attributed in
+[`launcher3/assets/ARCTICONS_NOTICE.txt`](launcher3/assets/ARCTICONS_NOTICE.txt).
+The launcher also keeps a dark circular icon treatment, pins Panchanga on the
+home screen, and removes the fixed search bar, Smartspace, and suggested apps.
 
 Open [`launcher3/`](launcher3/) in Android Studio. Build details and the
 upstream feature list are in [`launcher3/README.md`](launcher3/README.md).

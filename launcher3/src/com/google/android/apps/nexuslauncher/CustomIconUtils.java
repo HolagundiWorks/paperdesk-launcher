@@ -134,20 +134,69 @@ public class CustomIconUtils {
     static void parsePack(CustomDrawableFactory factory, PackageManager pm, String iconPack) {
         Resources res = BuiltInIconPack.getResources(factory.getContext());
         if (res == null) return;
-        addBuiltIn(factory, res, iconPack, "com.sec.android.app.camera/.Camera", "samsung_camera");
-        addBuiltIn(factory, res, iconPack, "com.samsung.android.app.contacts/com.samsung.android.contacts.contactslist.PeopleActivity", "samsung_contacts");
-        addBuiltIn(factory, res, iconPack, "com.sec.android.gallery3d/com.samsung.android.gallery.app.activity.GalleryActivity", "samsung_gallery");
-        addBuiltIn(factory, res, iconPack, "com.samsung.android.messaging/com.android.mms.ui.ConversationComposer", "messages");
-        addBuiltIn(factory, res, iconPack, "com.samsung.android.dialer/.DialtactsActivity", "phone");
-        addBuiltIn(factory, res, iconPack, "com.android.settings/.Settings", "settings");
-        Log.i("PaperdeskIcons", "Loaded " + factory.packComponents.size()
-                + " built-in Arcticons mappings");
+        try {
+            int resId = res.getIdentifier("appfilter", "xml", iconPack);
+            if (resId != 0) {
+                String compStart = "ComponentInfo{";
+                int compStartLength = compStart.length();
+                String compEnd = "}";
+                int compEndLength = compEnd.length();
+
+                XmlResourceParser parseXml = res.getXml(resId);
+                while (parseXml.next() != XmlPullParser.END_DOCUMENT) {
+                    if (parseXml.getEventType() != XmlPullParser.START_TAG) continue;
+                    String name = parseXml.getName();
+                    boolean isCalendar = name.equals("calendar");
+                    if (isCalendar || name.equals("item")) {
+                        String componentName = parseXml.getAttributeValue(null, "component");
+                        String drawableName = parseXml.getAttributeValue(null, isCalendar ? "prefix" : "drawable");
+                        if (componentName == null || drawableName == null
+                                || !componentName.startsWith(compStart)
+                                || !componentName.endsWith(compEnd)) {
+                            continue;
+                        }
+                        componentName = componentName.substring(compStartLength, componentName.length() - compEndLength);
+                        ComponentName parsed = ComponentName.unflattenFromString(componentName);
+                        if (parsed == null) continue;
+                        if (isCalendar) {
+                            factory.packCalendars.put(parsed, drawableName);
+                        } else {
+                            factory.packDrawables.put(parsed, drawableName);
+                        }
+                    } else if (name.equals("dynamic-clock")) {
+                        String drawableName = parseXml.getAttributeValue(null, "drawable");
+                        if (drawableName == null) continue;
+                        int drawableId = res.getIdentifier(drawableName, "drawable", iconPack);
+                        if (drawableId != 0) {
+                            factory.packClocks.put(drawableId, new CustomClock.Metadata(
+                                    parseXml.getAttributeIntValue(null, "hourLayerIndex", -1),
+                                    parseXml.getAttributeIntValue(null, "minuteLayerIndex", -1),
+                                    parseXml.getAttributeIntValue(null, "secondLayerIndex", -1),
+                                    parseXml.getAttributeIntValue(null, "defaultHour", 0),
+                                    parseXml.getAttributeIntValue(null, "defaultMinute", 0),
+                                    parseXml.getAttributeIntValue(null, "defaultSecond", 0)));
+                        }
+                    }
+                }
+                parseXml.close();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        }
+        addBuiltIn(factory, "com.sec.android.app.camera/.Camera", "samsung_camera");
+        addBuiltIn(factory, "com.samsung.android.app.contacts/com.samsung.android.contacts.contactslist.PeopleActivity", "samsung_contacts");
+        addBuiltIn(factory, "com.sec.android.gallery3d/com.samsung.android.gallery.app.activity.GalleryActivity", "samsung_gallery");
+        addBuiltIn(factory, "com.samsung.android.messaging/com.android.mms.ui.ConversationComposer", "messages");
+        addBuiltIn(factory, "com.samsung.android.dialer/.DialtactsActivity", "phone");
+        addBuiltIn(factory, "com.android.settings/.Settings", "settings");
+        Log.i("PaperdeskIcons", "Inherited " + factory.packDrawables.size()
+                + " Arcticons icons");
     }
 
-    private static void addBuiltIn(CustomDrawableFactory factory, Resources res, String iconPack,
-            String component, String drawable) {
+    private static void addBuiltIn(CustomDrawableFactory factory, String component, String drawable) {
         ComponentName name = ComponentName.unflattenFromString(component);
-        int drawableId = res.getIdentifier(drawable, "drawable", iconPack);
-        if (name != null && drawableId != 0) factory.packComponents.put(name, drawableId);
+        if (name != null && !factory.packDrawables.containsKey(name)) {
+            factory.packDrawables.put(name, drawable);
+        }
     }
 }
