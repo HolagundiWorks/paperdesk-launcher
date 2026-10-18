@@ -1,12 +1,15 @@
-# Paperdesk Launcher Workspace
+# Paperdesk Launcher
 
-Paperdesk is now developed as an adaptive Android HOME launcher. The repository
-also retains the earlier device-specific projects and the MadhvaNidhi source so
-they can continue to be maintained independently.
+Paperdesk Launcher is the combined workspace for the Paperdesk home apps and the
+earlier device-specific projects. It merges
+[HolagundiWorks/paperdesk](https://github.com/HolagundiWorks/paperdesk) with
+[HolagundiWorks/Launcher3](https://github.com/HolagundiWorks/Launcher3)
+(`paperdesk-custom`).
 
 | Flavor | Target device | Folder | Purpose |
 | --- | --- | --- | --- |
 | **Paperdesk Launcher** | Android 7.1+ phones and tablets | [`paperdesk-launcher/`](paperdesk-launcher/) | Adaptive HOME launcher with a focused app list and first-class shortcuts for the Human Centric Works app family |
+| **Rootless Paperdesk** | Android 5.0+ phones | [`launcher3/`](launcher3/) | Rootless Pixel Launcher customized for Paperdesk: built-in Arcticons, dark circular icons, Panchanga pinned on the home screen |
 | **AcharyaOS** | Samsung Galaxy J2 (`SM-J320M`) | [`acharya-os/`](acharya-os/) | Landscape launcher and focused daily environment for dharma, reading, scheduling, notes, and desk tools |
 | **VishwakarmaOS** | Samsung Galaxy A10s (`SM-A107F/DS`) | [`vishwakarma-os/`](vishwakarma-os/) | A10s OS/device customization, rooting and recovery tools, USB protocol, and Windows companion |
 
@@ -19,8 +22,9 @@ folder unless it is deliberately extracted as shared code.
 ## Repository layout
 
 ```text
-paperdesk/
-├── paperdesk-launcher/          # Adaptive Android HOME launcher
+paperdesk-launcher/
+├── paperdesk-launcher/          # Focused Android HOME launcher
+├── launcher3/                  # Rootless Pixel Launcher (paperdesk-custom)
 ├── acharya-os/                 # Active Samsung J2 Android flavor
 │   └── resources/reference/    # Curated source documents and catalogues
 ├── vishwakarma-os/             # Samsung A10s flavor
@@ -45,6 +49,17 @@ cd paperdesk-launcher
 
 After installing the APK, open Paperdesk and choose **Make Paperdesk default**.
 Keep the device's existing launcher installed until Paperdesk has been tested.
+
+## Rootless Paperdesk
+
+Rootless Paperdesk (`in.hcworks.paperdesk.rootless`) is the Pixel-style HOME
+launcher brought in from Launcher3 branch `paperdesk-custom`. Its Paperdesk
+changes bundle Arcticons, keep the icon treatment dark and circular, pin
+Panchanga on the home screen, and remove the fixed search bar, Smartspace, and
+suggested apps.
+
+Open [`launcher3/`](launcher3/) in Android Studio. Build details and the
+upstream feature list are in [`launcher3/README.md`](launcher3/README.md).
 
 ## Acharya OS
 
